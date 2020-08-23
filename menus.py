@@ -64,9 +64,9 @@ class GameOverMenu(Menu):
         super().__init__()
         self.handler = handler
         self.game = game
-        self.add_button('Main Menu', 400, 600, self.main_click)
-        self.add_button('Quit', 400, 450, self.quit_click)
-        self.add_text('GAME OVER', 400, 200)
+        self.add_button('Main Menu', 750, 450, self.main_click)
+        self.add_button('Quit', 750, 300, self.quit_click)
+        self.add_text('GAME OVER', 750, 600)
 
     def main_click(self):
         self.handler.set_menu(menuHandler.MAIN)

@@ -186,6 +186,8 @@ class NamelessDungeonCrawler(arcade.Window):
     def on_mouse_press(self, x, y, button, modifiers):
         if not self.in_menu:
             if self.attack_cooldown == 0:
+
+                # Redo this at some point to use numpy and vector calculus to determine the angle and location
                 spawn_x = self.player_sprite.center_x
                 spawn_y = self.player_sprite.center_y
                 base_angle = 0
