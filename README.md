@@ -6,7 +6,7 @@ To run this game run the "game.py" file in the terminal.
 In order to run this game you will have to have the Arcade package for python installed
 as well as the most recent version of python.
 
-    To install Arcade go to this link: https://arcade.academy/installation.html
+To install Arcade go to this link: https://arcade.academy/installation.html
   
     If you already have python installed do the following
   
