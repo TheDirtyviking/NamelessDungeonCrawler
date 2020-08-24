@@ -1,9 +1,12 @@
 import arcade
 import room_setup
+import numpy as np
+from numpy import linalg as LA
+import math
 
 class Goblin():
 
-    def __init__(self,  health = 4, damage = 2, armor = 0, center_x = 0, center_y = 0):
+    def __init__(self,  health = 4, damage = 2, armor = 0, center_x = 0, center_y = 0, attack_range = 45):
         self.health = health
         self.damage = damage
         self.armor = armor
@@ -11,6 +14,7 @@ class Goblin():
         self.y = center_y
         self.movespeed = 3
         self.attack_cooldown = 0
+        self.attack_range = 45
         
 
     def die(self, room, left, bottom):
@@ -47,32 +51,13 @@ class Goblin():
             if self.attack_cooldown <= 0:
                 spawn_x = self.x
                 spawn_y = self.y
-                base_angle = 0
-                if slayer_position[0] > self.x + 25:
-                    spawn_x += 40
-                    base_angle = 360
-                elif slayer_position[0] < self.x - 25:
-                    spawn_x -= 40
-                    base_angle = 180
-                if slayer_position[1] < self.y - 25:
-                    spawn_y -= 40
-                    if base_angle == 180:
-                        base_angle += 45
-                    elif base_angle == 360:
-                        base_angle -= 45
-                    else:
-                        base_angle = 270
-                elif slayer_position[1] > self.y + 25:
-                    spawn_y += 40
-                    if base_angle == 180:
-                        base_angle -= 45
-                    elif base_angle == 360:
-                        base_angle += 45
-                    else:
-                        base_angle = 90
-                if spawn_x == self.x and spawn_y == self.y:
-                    spawn_x += 40
-                spawn_angle = base_angle
-                room_setup.add_enemy_attack(room, spawn_x, spawn_y, spawn_angle, self.damage)
+                connect_vector = [slayer_position[0] - spawn_x, slayer_position[1] - spawn_y]
+                connect_vector = connect_vector / LA.norm(connect_vector)
+                angle = math.degrees(np.arccos(connect_vector)[0])
+                if slayer_position[1] < spawn_y:
+                    angle = -angle
+                connect_vector = np.multiply(connect_vector, self.attack_range)
+                spawn_vector = np.add(connect_vector, [spawn_x, spawn_y])
+                room_setup.add_enemy_attack(room, spawn_vector[0], spawn_vector[1], angle, self.damage)
                 self.attack_cooldown = 20
         

@@ -11,6 +11,7 @@ class Slayer():
         self.sight = 2
         self.movespeed = 5
         self.position = [100, 100]
+        self.attack_range = 50
 
     def take_damage(self, damage):
         self.health -= (damage - self.armor)

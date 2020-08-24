@@ -4,7 +4,9 @@ import os
 import playerUI
 import slayer
 import menuHandler
-import sys
+import numpy as np
+from numpy import linalg as LA
+import math
 
 SPRITE_SCALING = .6
 PLAYER_SCALING = .9
@@ -186,38 +188,16 @@ class NamelessDungeonCrawler(arcade.Window):
     def on_mouse_press(self, x, y, button, modifiers):
         if not self.in_menu:
             if self.attack_cooldown == 0:
-
-                # Redo this at some point to use numpy and vector calculus to determine the angle and location
                 spawn_x = self.player_sprite.center_x
                 spawn_y = self.player_sprite.center_y
-                base_angle = 0
-                if x > self.player_sprite.center_x + 25:
-                    spawn_x += 40
-                    base_angle = 360
-                elif x < self.player_sprite.center_x - 25:
-                    spawn_x -= 40
-                    base_angle = 180
-                if y < self.player_sprite.center_y - 25:
-                    spawn_y -= 40
-                    if base_angle == 180:
-                        base_angle += 45
-                    elif base_angle == 360:
-                        base_angle -= 45
-                    else:
-                        base_angle = 270
-                elif y > self.player_sprite.center_y + 25:
-                    spawn_y += 40
-                    if base_angle == 180:
-                        base_angle -= 45
-                    elif base_angle == 360:
-                        base_angle += 45
-                    else:
-                        base_angle = 90
-                if spawn_x == self.player_sprite.center_x and spawn_y == self.player_sprite.center_y:
-                    spawn_x += 40
-                    spawn_y += 40
-                spawn_angle = base_angle
-                room_setup.add_player_attack(self.rooms[self.current_room], spawn_x, spawn_y, spawn_angle, self.slayer.damage)
+                connect_vector = [x - spawn_x, y - spawn_y]
+                connect_vector = connect_vector / LA.norm(connect_vector)
+                angle = math.degrees(np.arccos(connect_vector)[0])
+                if y < spawn_y:
+                    angle = -angle
+                connect_vector = np.multiply(connect_vector, self.slayer.attack_range)
+                spawn_vector = np.add(connect_vector, [spawn_x, spawn_y])
+                room_setup.add_player_attack(self.rooms[self.current_room], spawn_vector[0], spawn_vector[1], angle, self.slayer.damage)
                 self.attack_cooldown = 15
         else:
             self.check_mouse_press_for_buttons(x, y, self.handler.menu_list[self.handler.menu].buttons)
