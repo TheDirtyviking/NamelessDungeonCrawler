@@ -7,6 +7,8 @@ import menuHandler
 import numpy as np
 from numpy import linalg as LA
 import math
+import sound_manager
+import time
 
 SPRITE_SCALING = .6
 PLAYER_SCALING = .9
@@ -51,7 +53,9 @@ class NamelessDungeonCrawler(arcade.Window):
     def setup(self):
         
         self.handler = menuHandler.Menu_Handler(self)
+        self.music_handler = sound_manager.MusicManager()
         self.in_menu = True
+        self.music_handler.play_music(0)
 
     def game_setup(self):
         self.player_sprite = arcade.Sprite("resources/images/slayer.png", PLAYER_SCALING)
@@ -85,10 +89,10 @@ class NamelessDungeonCrawler(arcade.Window):
             self.rooms[self.current_room].item_list.draw()
             self.rooms[self.current_room].enemy_list.draw()
             self.rooms[self.current_room].player_attack_list.draw()
-            self.rooms[self.current_room].enemy_attack_list.draw()
             self.rooms[self.current_room].fog_list.draw()
             self.player_ui.on_draw(self.slayer.health, self.slayer.armor)
             self.player_list.draw()
+            self.rooms[self.current_room].enemy_attack_list.draw()
 
     def on_update(self, delta_time):
         if not self.in_menu and self.slayer.health <= 0:
@@ -129,6 +133,11 @@ class NamelessDungeonCrawler(arcade.Window):
             room_setup.update_fog(self.rooms[self.current_room], self.player_sprite.position, self.slayer.sight)
             room_setup.update_enemies(self.rooms[self.current_room], self.player_sprite.position)
             room_setup.update_enemy_attacks(self.rooms[self.current_room], self.player_sprite, self.slayer)
+
+            position = self.music_handler.music.get_stream_position()
+            if position == 0.0:
+                self.music_handler.play_music(0)
+
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.W:
@@ -198,6 +207,7 @@ class NamelessDungeonCrawler(arcade.Window):
                 connect_vector = np.multiply(connect_vector, self.slayer.attack_range)
                 spawn_vector = np.add(connect_vector, [spawn_x, spawn_y])
                 room_setup.add_player_attack(self.rooms[self.current_room], spawn_vector[0], spawn_vector[1], angle, self.slayer.damage)
+                sound_manager.play_sound(sound_manager.PLAYER_ATTACK, .15)
                 self.attack_cooldown = 15
         else:
             self.check_mouse_press_for_buttons(x, y, self.handler.menu_list[self.handler.menu].buttons)

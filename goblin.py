@@ -3,6 +3,7 @@ import room_setup
 import numpy as np
 from numpy import linalg as LA
 import math
+import sound_manager
 
 class Goblin():
 
@@ -22,7 +23,7 @@ class Goblin():
         blood_splatter.left = left
         blood_splatter.bottom = bottom
         room.accent_list.append(blood_splatter)
-        #play a sound effect
+        sound_manager.play_sound(sound_manager.GOBLIN_DEATH, .15)
 
     def take_damage(self, damage):
         pain = damage - self.armor
@@ -48,6 +49,10 @@ class Goblin():
             else:
                 sprite.change_y = 0
         if arcade.has_line_of_sight(slayer_position, (self.x, self.y), room.wall_list, 50):
+            if sprite.change_x != 0:
+                sprite.change_x = 0
+            if sprite.change_y != 0:
+                sprite.change_y = 0
             if self.attack_cooldown <= 0:
                 spawn_x = self.x
                 spawn_y = self.y
