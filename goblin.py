@@ -65,4 +65,6 @@ class Goblin():
                 spawn_vector = np.add(connect_vector, [spawn_x, spawn_y])
                 room_setup.add_enemy_attack(room, spawn_vector[0], spawn_vector[1], angle, self.damage)
                 self.attack_cooldown = 20
+                sound_manager.play_sound(sound_manager.GOBLIN_ATTACK, .15)
+        
         

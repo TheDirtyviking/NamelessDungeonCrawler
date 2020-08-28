@@ -98,6 +98,7 @@ class NamelessDungeonCrawler(arcade.Window):
         if not self.in_menu and self.slayer.health <= 0:
             self.in_menu = True
             self.handler.set_menu(menuHandler.GAME_OVER)
+            sound_manager.play_sound(sound_manager.PLAYER_DEATH, .15)
         if self.in_menu:
             self.handler.draw_menu()
         else:
@@ -228,6 +229,7 @@ class NamelessDungeonCrawler(arcade.Window):
     def win_game(self):
         self.in_menu = True
         self.handler.set_menu(menuHandler.WIN)
+        sound_manager.play_sound(sound_manager.GAME_WIN, .15)
 
     def check_mouse_press_for_buttons(self, x, y, button_list):
         for button in button_list:
