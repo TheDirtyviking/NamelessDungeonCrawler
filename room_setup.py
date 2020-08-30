@@ -55,13 +55,30 @@ def add_heal(room, x, y):
     heal.pickup = items.heal_get_picked_up
     room.item_list.append(heal)
 
-def add_goblin_1(room, x, y, name):
+def add_goblin_1(room, x, y):
     gobbo = arcade.Sprite("resources/images/goblin_1.png", .7)
     gobbo.left = x * SPRITE_SIZE + 15
     gobbo.bottom = y * SPRITE_SIZE + 15
     gobbo.Goblin = goblin.Goblin(center_x=gobbo._get_center_x(), center_y=gobbo._get_center_y())
     gobbo.move = gobbo.Goblin.update
-    gobbo.name = name
+    gobbo.engine = None
+    room.enemy_list.append(gobbo)
+
+def add_goblin_2(room, x, y,):
+    gobbo = arcade.Sprite("resources/images/goblin_2.png", .7)
+    gobbo.left = x * SPRITE_SIZE + 15
+    gobbo.bottom = y * SPRITE_SIZE + 15
+    gobbo.Goblin = goblin.Goblin(5, 2, 1, gobbo._get_center_x(), gobbo._get_center_y())
+    gobbo.move = gobbo.Goblin.update
+    gobbo.engine = None
+    room.enemy_list.append(gobbo)
+
+def add_goblin_3(room, x, y):
+    gobbo = arcade.Sprite("resources/images/goblin_3.png", .9)
+    gobbo.left = x * SPRITE_SIZE + 15
+    gobbo.bottom = y * SPRITE_SIZE + 15
+    gobbo.Goblin = goblin.Goblin(7, 3, 1, gobbo._get_center_x(), gobbo._get_center_y(), gobtype=goblin.HOBGOBLIN)
+    gobbo.move = goblin.Goblin.update
     gobbo.engine = None
     room.enemy_list.append(gobbo)
 
@@ -238,11 +255,14 @@ def setup_room_1():
     add_torch(room, 23, 13)
     add_sword(room, 23, 1)
     add_heal(room, 4, 1)
+    add_shield(room, 23, 7)
 
     room.enemy_list = arcade.SpriteList()
-    add_goblin_1(room, 3, 13, 'one')
-    add_goblin_1(room, 5, 11, 'two')
-    add_goblin_1(room, 4, 10, 'three')
+    add_goblin_1(room, 3, 13)
+    add_goblin_1(room, 5, 11)
+    add_goblin_1(room, 4, 10)
+    add_goblin_1(room, 21, 9)
+    add_goblin_2(room, 19, 8)
     
     room.player_attack_list = arcade.SpriteList()
     room.enemy_attack_list = arcade.SpriteList()

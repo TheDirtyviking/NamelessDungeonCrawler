@@ -5,9 +5,12 @@ from numpy import linalg as LA
 import math
 import sound_manager
 
+GOBLIN = 0
+HOBGOBLIN = 1
+
 class Goblin():
 
-    def __init__(self,  health = 4, damage = 2, armor = 0, center_x = 0, center_y = 0, attack_range = 45):
+    def __init__(self,  health = 4, damage = 2, armor = 0, center_x = 0, center_y = 0, attack_range = 45, gobtype=GOBLIN):
         self.health = health
         self.damage = damage
         self.armor = armor
@@ -16,6 +19,7 @@ class Goblin():
         self.movespeed = 3
         self.attack_cooldown = 0
         self.attack_range = 45
+        self.type = gobtype
         
 
     def die(self, room, left, bottom):
@@ -23,13 +27,15 @@ class Goblin():
         blood_splatter.left = left
         blood_splatter.bottom = bottom
         room.accent_list.append(blood_splatter)
-        sound_manager.play_sound(sound_manager.GOBLIN_DEATH, .15)
+        if self.type == GOBLIN:
+            sound_manager.play_sound(sound_manager.GOBLIN_DEATH, .15)
+        else:
+            sound_manager.play_sound(sound_manager.HOBGOBLIN_DEATH, .15)
 
     def take_damage(self, damage):
         pain = damage - self.armor
         if pain > 0:
             self.health -= pain
-            #play a sound effect
 
     def update(self, slayer_position, room, sprite):
         self.x = sprite.center_x
@@ -65,6 +71,9 @@ class Goblin():
                 spawn_vector = np.add(connect_vector, [spawn_x, spawn_y])
                 room_setup.add_enemy_attack(room, spawn_vector[0], spawn_vector[1], angle, self.damage)
                 self.attack_cooldown = 20
-                sound_manager.play_sound(sound_manager.GOBLIN_ATTACK, .15)
+                if self.type == GOBLIN:
+                    sound_manager.play_sound(sound_manager.GOBLIN_ATTACK, .15)
+                else:
+                    sound_manager.play_sound(sound_manager.HOBGOBLIN_ATTACK, .15)
         
         
