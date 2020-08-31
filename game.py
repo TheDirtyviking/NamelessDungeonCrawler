@@ -127,7 +127,7 @@ class NamelessDungeonCrawler(arcade.Window):
             elif self.difficulty == HARD:
                 self.rooms[self.current_room].hard_enemy_list.draw()
             self.rooms[self.current_room].player_attack_list.draw()
-            #self.rooms[self.current_room].fog_list.draw()
+            self.rooms[self.current_room].fog_list.draw()
             self.player_ui.on_draw(self.slayer.health, self.slayer.armor)
             self.player_list.draw()
             self.rooms[self.current_room].enemy_attack_list.draw()
