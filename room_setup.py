@@ -279,7 +279,6 @@ def room_5_move_room(room, slayer_pos, game, difficulty):
     return None
 
 def room_6_move_room(room, slayer_pos, gm, difficulty):
-    print(len(room.easy_enemy_list))
     if (difficulty == game.EASY and len(room.easy_enemy_list) == 0) or (difficulty == game.MODERATE and len(room.moderate_enemy_list) == 0) or (difficulty == game.HARD and len(room.hard_enemy_list) == 0):
         gm.win_game()
     elif slayer_pos[1] > SPRITE_SIZE * 15:
