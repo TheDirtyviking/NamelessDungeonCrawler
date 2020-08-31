@@ -56,32 +56,47 @@ def add_heal(room, x, y):
     heal.pickup = items.heal_get_picked_up
     room.item_list.append(heal)
 
-def add_goblin_1(room, x, y):
+def add_goblin_1(room, x, y, difficulty):
     gobbo = arcade.Sprite("resources/images/goblin_1.png", .7)
     gobbo.left = x * SPRITE_SIZE + 15
     gobbo.bottom = y * SPRITE_SIZE + 15
     gobbo.Goblin = goblin.Goblin(center_x=gobbo._get_center_x(), center_y=gobbo._get_center_y())
     gobbo.move = gobbo.Goblin.update
     gobbo.engine = None
-    room.enemy_list.append(gobbo)
+    if difficulty <= game.HARD:
+        room.hard_enemy_list.append(gobbo)
+    if difficulty <= game.MODERATE:
+        room.moderate_enemy_list.append(gobbo)
+    if difficulty <= game.EASY:
+        room.easy_enemy_list.append(gobbo)
 
-def add_goblin_2(room, x, y,):
+def add_goblin_2(room, x, y, difficulty):
     gobbo = arcade.Sprite("resources/images/goblin_2.png", .7)
     gobbo.left = x * SPRITE_SIZE + 15
     gobbo.bottom = y * SPRITE_SIZE + 15
     gobbo.Goblin = goblin.Goblin(5, 2, 1, gobbo._get_center_x(), gobbo._get_center_y())
     gobbo.move = gobbo.Goblin.update
     gobbo.engine = None
-    room.enemy_list.append(gobbo)
+    if difficulty <= game.HARD:
+        room.hard_enemy_list.append(gobbo)
+    if difficulty <= game.MODERATE:
+        room.moderate_enemy_list.append(gobbo)
+    if difficulty <= game.EASY:
+        room.easy_enemy_list.append(gobbo)
 
-def add_goblin_3(room, x, y):
+def add_goblin_3(room, x, y, difficulty):
     gobbo = arcade.Sprite("resources/images/goblin_3.png", .9)
     gobbo.left = x * SPRITE_SIZE + 15
     gobbo.bottom = y * SPRITE_SIZE + 15
     gobbo.Goblin = goblin.Goblin(15, 5, 2, gobbo._get_center_x(), gobbo._get_center_y(), gobtype=goblin.HOBGOBLIN, attack_range=60, movespeed=2)
     gobbo.move = goblin.Goblin.update
     gobbo.engine = None
-    room.enemy_list.append(gobbo)
+    if difficulty <= game.HARD:
+        room.hard_enemy_list.append(gobbo)
+    if difficulty <= game.MODERATE:
+        room.moderate_enemy_list.append(gobbo)
+    if difficulty <= game.EASY:
+        room.easy_enemy_list.append(gobbo)
 
 def add_player_attack(room, x, y, angle, damage):
     attack = arcade.Sprite("resources/images/attack_swipe.png")
@@ -104,7 +119,6 @@ def add_enemy_attack(room, x, y, angle, damage):
     room.enemy_attack_list.append(attack)
 
 def add_fog(room):
-        #Add fog
     room.fog_list = arcade.SpriteList()
     for x in range(0, 25):
         for y in range(0, 15):
@@ -117,13 +131,19 @@ def add_fog(room):
                 if wall.position == fog.position:
                     fog.is_wall = True
 
-def update_player_attacks(room):
+def update_player_attacks(room, difficulty):
     for attack in room.player_attack_list:
         attack.timer -= 1
         if attack.timer <= 0:
             room.player_attack_list.remove(attack)
         else:
-            hit_enemies = arcade.check_for_collision_with_list(attack, room.enemy_list)
+            hit_enemies = None
+            if difficulty == game.EASY:
+                hit_enemies = arcade.check_for_collision_with_list(attack, room.easy_enemy_list)
+            elif difficulty == game.MODERATE:
+                hit_enemies = arcade.check_for_collision_with_list(attack, room.moderate_enemy_list)
+            elif difficulty == game.HARD:
+                hit_enemies = arcade.check_for_collision_with_list(attack, room.hard_enemy_list)
             for enemy in hit_enemies:
                 b_already_hit = False
                 for damaged_enemy in attack.damaged_sprites:
@@ -164,14 +184,21 @@ def update_fog(room, player_position, player_sight):
                 room.fog_list.append(visible)
                 room.visible_list.remove(visible)
 
-def update_enemies(room, player_position):
+def update_enemies(room, player_position, difficulty):
     player_x = player_position[0]
     player_y = player_position[1]
-    for enemy in room.enemy_list:
+    enemies = None
+    if difficulty == game.EASY:
+        enemies = room.easy_enemy_list
+    elif difficulty == game.MODERATE:
+        enemies = room.moderate_enemy_list
+    elif difficulty == game.HARD:
+        enemies = room.hard_enemy_list
+    for enemy in enemies:
         if enemy.Goblin.health <= 0:
             enemy.Goblin.die(room, enemy.left, enemy.bottom)
-            room.enemy_list.remove(enemy)
-            add_enemy_engine(room.enemy_list, room.wall_list)
+            enemies.remove(enemy)
+            add_enemy_engine(enemies, room.wall_list)
         if abs(enemy.center_x - player_x) <= 4 * SPRITE_SIZE:
             if abs(enemy.center_y - player_y) <= 4 * SPRITE_SIZE:
                 enemy.Goblin.update(player_position, room, enemy)
@@ -193,7 +220,6 @@ class Room:
         self.player_attack_list = None
         self.enemy_attack_list = None
         self.wall_list = None
-        self.enemy_list = None
         self.item_list = None
         self.floor_list = None
         self.fog_list = None
@@ -202,14 +228,17 @@ class Room:
         self.accent_list = None
         self.check_move_room = None
         self.boss_fight = None
+        self.easy_enemy_list = None
+        self.moderate_enemy_list = None
+        self.hard_enemy_list = None
             
-def room_1_move_room(room, slayer_pos, game):
+def room_1_move_room(room, slayer_pos, game, difficulty):
     if slayer_pos[0] > SPRITE_SIZE * 25:
         game.update_room(1)
         return (5, SPRITE_SIZE * 4.5)
     return None
 
-def room_2_move_room(room, slayer_pos, game):
+def room_2_move_room(room, slayer_pos, game, difficulty):
     if slayer_pos[1] < 0:
         if slayer_pos[0] > SPRITE_SIZE * 20 and slayer_pos[0] < SPRITE_SIZE * 22:
             game.update_room(3)
@@ -221,7 +250,7 @@ def room_2_move_room(room, slayer_pos, game):
         game.update_room(0)
         return (SPRITE_SIZE * 24, SPRITE_SIZE * 5)
 
-def room_3_move_room(room, slayer_pos, game):
+def room_3_move_room(room, slayer_pos, game, difficulty):
     if slayer_pos[1] > SPRITE_SIZE * 15:
         game.update_room(1)
         return (SPRITE_SIZE * 5, 5)
@@ -234,7 +263,7 @@ def room_3_move_room(room, slayer_pos, game):
             return (SPRITE_SIZE * 3, SPRITE_SIZE * 14.5)
     return None
 
-def room_4_move_room(room, slayer_pos, game):
+def room_4_move_room(room, slayer_pos, game, difficulty):
     if slayer_pos[1] > SPRITE_SIZE * 15:
         game.update_room(1)
         return (SPRITE_SIZE * 21, 5)
@@ -243,21 +272,22 @@ def room_4_move_room(room, slayer_pos, game):
         return (SPRITE_SIZE * 13, SPRITE_SIZE * 14.5)
     return None
 
-def room_5_move_room(room, slayer_pos, game):
+def room_5_move_room(room, slayer_pos, game, difficulty):
     if slayer_pos[1] > SPRITE_SIZE * 15:
         game.update_room(2)
         return (SPRITE_SIZE * 5, 5)
     return None
 
-def room_6_move_room(room, slayer_pos, game):
-    if len(room.enemy_list) == 0:
-        game.win_game()
+def room_6_move_room(room, slayer_pos, gm, difficulty):
+    print(len(room.easy_enemy_list))
+    if (difficulty == game.EASY and len(room.easy_enemy_list) == 0) or (difficulty == game.MODERATE and len(room.moderate_enemy_list) == 0) or (difficulty == game.HARD and len(room.hard_enemy_list) == 0):
+        gm.win_game()
     elif slayer_pos[1] > SPRITE_SIZE * 15:
         if slayer_pos[0] < SPRITE_SIZE * 4 and slayer_pos[0] > SPRITE_SIZE * 2:
-            game.update_room(2)
+            gm.update_room(2)
             return (SPRITE_SIZE * 23, 5)
         elif slayer_pos[0] > SPRITE_SIZE * 12 and slayer_pos[0] < SPRITE_SIZE * 14:
-            game.update_room(3)
+            gm.update_room(3)
             return (SPRITE_SIZE * 7, 5)
     elif (not room.boss_fight) and slayer_pos[1] < SPRITE_SIZE * 11:
         add_wall(room, 7, 11)
@@ -270,6 +300,15 @@ def room_6_move_room(room, slayer_pos, game):
         room.boss_fight = True
     return None
     
+def update_difficulty(room, difficulty):
+    if difficulty == game.EASY:
+        room.enemy_list = room.easy_enemy_list
+    elif difficulty == game.MODERATE:
+        room.enemy_list = room.moderate_enemy_list
+    elif difficulty == game.HARD:
+        room.enemy_list = room.hard_enemy_list
+    add_enemy_engine(room.enemy_list, room.wall_list)
+
 def setup_room_1():
     room = Room()
 
@@ -324,21 +363,21 @@ def setup_room_1():
 
     #Add enemies
     room.enemy_list = arcade.SpriteList()
-    add_goblin_1(room, 3, 13)
-    add_goblin_1(room, 5, 11)
-    add_goblin_1(room, 4, 10)
-    add_goblin_1(room, 21, 9)
-    add_goblin_2(room, 19, 8)
-    add_goblin_1(room, 5, 6)
+    room.easy_enemy_list = arcade.SpriteList()
+    room.moderate_enemy_list = arcade.SpriteList()
+    room.hard_enemy_list = arcade.SpriteList()
+    add_goblin_1(room, 3, 13, game.EASY)
+    add_goblin_1(room, 5, 11, game.EASY)
+    add_goblin_1(room, 4, 10, game.MODERATE)
+    add_goblin_1(room, 21, 9, game.EASY)
+    add_goblin_2(room, 19, 8, game.MODERATE)
+    add_goblin_1(room, 5, 6, game.MODERATE)
     
     #Initialize other lists
     room.visible_list = arcade.SpriteList()
     room.player_attack_list = arcade.SpriteList()
     room.enemy_attack_list = arcade.SpriteList()
     room.accent_list = arcade.SpriteList()
-
-    #Add physics engines to enemies
-    add_enemy_engine(room.enemy_list, room.wall_list)
 
     #Add room movement logic
     room.check_move_room = room_1_move_room
@@ -403,20 +442,20 @@ def setup_room_2():
 
     #Add enemies
     room.enemy_list = arcade.SpriteList()
-    add_goblin_1(room, 2, 12)
-    add_goblin_1(room, 8, 2)
-    add_goblin_1(room, 15, 8)
-    add_goblin_1(room, 17, 4)
-    add_goblin_2(room, 12, 11)
+    room.easy_enemy_list = arcade.SpriteList()
+    room.moderate_enemy_list = arcade.SpriteList()
+    room.hard_enemy_list = arcade.SpriteList()
+    add_goblin_1(room, 2, 12, game.EASY)
+    add_goblin_1(room, 8, 2, game.MODERATE)
+    add_goblin_1(room, 15, 8, game.EASY)
+    add_goblin_1(room, 17, 4, game.EASY)
+    add_goblin_2(room, 12, 11, game.MODERATE)
 
     #Initialize other lists
     room.visible_list = arcade.SpriteList()
     room.player_attack_list = arcade.SpriteList()
     room.enemy_attack_list = arcade.SpriteList()
     room.accent_list = arcade.SpriteList()
-
-    #Add physics engines to enemies
-    add_enemy_engine(room.enemy_list, room.wall_list)
 
     #Add logic for moving rooms
     room.check_move_room = room_2_move_room
@@ -496,19 +535,19 @@ def setup_room_3():
 
     #Add enemies
     room.enemy_list = arcade.SpriteList()
-    add_goblin_1(room, 8, 9)
-    add_goblin_1(room, 15, 12)
-    add_goblin_1(room, 14, 10)
-    add_goblin_2(room, 10, 12)
+    room.easy_enemy_list = arcade.SpriteList()
+    room.moderate_enemy_list = arcade.SpriteList()
+    room.hard_enemy_list = arcade.SpriteList()
+    add_goblin_1(room, 8, 9, game.EASY)
+    add_goblin_1(room, 15, 12, game.EASY)
+    add_goblin_1(room, 14, 10, game.MODERATE)
+    add_goblin_2(room, 10, 12, game.HARD)
 
     #Initialize other lists
     room.visible_list = arcade.SpriteList()
     room.player_attack_list = arcade.SpriteList()
     room.enemy_attack_list = arcade.SpriteList()
     room.accent_list = arcade.SpriteList()
-
-    #Add physics engines to enemies
-    add_enemy_engine(room.enemy_list, room.wall_list)
 
     #Add logic for moving rooms
     room.check_move_room = room_3_move_room
@@ -573,21 +612,21 @@ def setup_room_4():
 
     #Add enemies
     room.enemy_list = arcade.SpriteList()
-    add_goblin_1(room, 2, 10)
-    add_goblin_1(room, 9, 10)
-    add_goblin_1(room, 17, 3)
-    add_goblin_1(room, 19, 5)
-    add_goblin_2(room, 15, 5)
-    add_goblin_2(room, 22, 3)
+    room.easy_enemy_list = arcade.SpriteList()
+    room.moderate_enemy_list = arcade.SpriteList()
+    room.hard_enemy_list = arcade.SpriteList()
+    add_goblin_1(room, 2, 10, game.MODERATE)
+    add_goblin_1(room, 9, 10, game.EASY)
+    add_goblin_1(room, 17, 3, game.MODERATE)
+    add_goblin_1(room, 19, 5, game.EASY)
+    add_goblin_2(room, 15, 5, game.EASY)
+    add_goblin_2(room, 22, 3, game.HARD)
 
     #Initialize other lists
     room.visible_list = arcade.SpriteList()
     room.player_attack_list = arcade.SpriteList()
     room.enemy_attack_list = arcade.SpriteList()
     room.accent_list = arcade.SpriteList()
-
-    #Add physics engines to enemies
-    add_enemy_engine(room.enemy_list, room.wall_list)
 
     #Add logic for moving rooms
     room.check_move_room = room_4_move_room
@@ -649,20 +688,20 @@ def setup_room_5():
 
     #Add enemies
     room.enemy_list = arcade.SpriteList()
-    add_goblin_1(room, 4, 7)
-    add_goblin_1(room, 18, 8)
-    add_goblin_1(room, 19, 10)
-    add_goblin_2(room, 2, 11)
-    add_goblin_2(room, 22, 6)
+    room.easy_enemy_list = arcade.SpriteList()
+    room.moderate_enemy_list = arcade.SpriteList()
+    room.hard_enemy_list = arcade.SpriteList()
+    add_goblin_1(room, 4, 7, game.EASY)
+    add_goblin_1(room, 18, 8, game.EASY)
+    add_goblin_1(room, 19, 10, game.MODERATE)
+    add_goblin_2(room, 2, 11, game.EASY)
+    add_goblin_2(room, 22, 6, game.MODERATE)
 
     #Initialize other lists
     room.visible_list = arcade.SpriteList()
     room.player_attack_list = arcade.SpriteList()
     room.enemy_attack_list = arcade.SpriteList()
     room.accent_list = arcade.SpriteList()
-
-    #Add physics engines to enemies
-    add_enemy_engine(room.enemy_list, room.wall_list)
 
     #Add logic for moving rooms
     room.check_move_room = room_5_move_room
@@ -714,15 +753,19 @@ def setup_room_6():
 
     #Add enemies
     room.enemy_list = arcade.SpriteList()
-    add_goblin_1(room, 3, 8)
-    add_goblin_1(room, 8, 6)
-    add_goblin_1(room, 16, 8)
-    add_goblin_1(room, 16, 4)
-    add_goblin_1(room, 21, 7)
-    add_goblin_2(room, 3, 4)
-    add_goblin_2(room, 13, 3)
-    add_goblin_2(room, 21, 11)
-    add_goblin_3(room, 21, 2)
+    room.easy_enemy_list = arcade.SpriteList()
+    room.moderate_enemy_list = arcade.SpriteList()
+    room.hard_enemy_list = arcade.SpriteList()
+    add_goblin_1(room, 3, 8, game.EASY)
+    add_goblin_1(room, 8, 6, game.EASY)
+    add_goblin_1(room, 16, 8, game.MODERATE)
+    add_goblin_1(room, 16, 4, game.EASY)
+    add_goblin_1(room, 21, 7, game.MODERATE)
+    add_goblin_2(room, 3, 4, game.MODERATE)
+    add_goblin_2(room, 13, 3, game.HARD)
+    add_goblin_2(room, 10, 7, game.MODERATE)
+    add_goblin_2(room, 21, 11, game.HARD)
+    add_goblin_3(room, 21, 2, game.EASY)
 
     #Initialize other lists
     room.visible_list = arcade.SpriteList()

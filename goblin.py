@@ -32,11 +32,15 @@ class Goblin():
             sound_manager.play_sound(sound_manager.GOBLIN_DEATH, .15)
         else:
             sound_manager.play_sound(sound_manager.HOBGOBLIN_DEATH, .15)
+            arcade.window_commands.pause(1.5)
+
 
     def take_damage(self, damage):
-        pain = damage - self.armor
-        if pain > 0:
-            self.health -= pain
+        damage -= 1
+        dealt = damage - self.armor
+        self.health -= 1
+        if dealt > 0:
+            self.health -= dealt
 
     def update(self, slayer_position, room, sprite):
         self.x = sprite.center_x

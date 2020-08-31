@@ -21,6 +21,9 @@ PLAYER_DAMAGE = 3
 PLAYER_HEALTH = 10
 PLAYER_ARMOR = 0
 MOVEMENT_SPEED = 5
+EASY = 0
+MODERATE = 1
+HARD = 2
 
 class NamelessDungeonCrawler(arcade.Window):
     
@@ -49,6 +52,8 @@ class NamelessDungeonCrawler(arcade.Window):
         self.handler = None
 
         self.in_menu = False
+
+        self.difficulty = None
     
     def setup(self):
         
@@ -56,6 +61,22 @@ class NamelessDungeonCrawler(arcade.Window):
         self.music_handler = sound_manager.MusicManager()
         self.in_menu = True
         self.music_handler.play_music(0)
+
+        self.rooms = []
+        room0 = room_setup.setup_room_1()
+        self.rooms.append(room0)
+        room1 = room_setup.setup_room_2()
+        self.rooms.append(room1)
+        room2 = room_setup.setup_room_3()
+        self.rooms.append(room2)
+        room3 = room_setup.setup_room_4()
+        self.rooms.append(room3)
+        room4 = room_setup.setup_room_5()
+        self.rooms.append(room4)
+        room5 = room_setup.setup_room_6()
+        self.rooms.append(room5)
+        self.current_room = 0
+        self.set_difficulty(MODERATE)
 
     def game_setup(self):
         self.player_sprite = arcade.Sprite("resources/images/slayer.png", PLAYER_SCALING)
@@ -79,6 +100,8 @@ class NamelessDungeonCrawler(arcade.Window):
         room5 = room_setup.setup_room_6()
         self.rooms.append(room5)
         self.current_room = 0
+        self.set_difficulty(self.difficulty)
+
         self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
 
         self.player_ui = playerUI.playerUI()
@@ -97,9 +120,14 @@ class NamelessDungeonCrawler(arcade.Window):
             self.rooms[self.current_room].wall_list.draw()
             self.rooms[self.current_room].accent_list.draw()
             self.rooms[self.current_room].item_list.draw()
-            self.rooms[self.current_room].enemy_list.draw()
+            if self.difficulty == EASY:
+                self.rooms[self.current_room].easy_enemy_list.draw()
+            elif self.difficulty == MODERATE:
+                self.rooms[self.current_room].moderate_enemy_list.draw()
+            elif self.difficulty == HARD:
+                self.rooms[self.current_room].hard_enemy_list.draw()
             self.rooms[self.current_room].player_attack_list.draw()
-            self.rooms[self.current_room].fog_list.draw()
+            #self.rooms[self.current_room].fog_list.draw()
             self.player_ui.on_draw(self.slayer.health, self.slayer.armor)
             self.player_list.draw()
             self.rooms[self.current_room].enemy_attack_list.draw()
@@ -114,7 +142,7 @@ class NamelessDungeonCrawler(arcade.Window):
         else:
             self.physics_engine.update()
 
-            new_pos = self.rooms[self.current_room].check_move_room(self.rooms[self.current_room], self.player_sprite.position, self)
+            new_pos = self.rooms[self.current_room].check_move_room(self.rooms[self.current_room], self.player_sprite.position, self, self.difficulty)
             if not new_pos == None:
                 self.player_sprite.position = new_pos
 
@@ -141,9 +169,9 @@ class NamelessDungeonCrawler(arcade.Window):
             if self.attack_cooldown > 0:
                 self.attack_cooldown -= 1
 
-            room_setup.update_player_attacks(self.rooms[self.current_room])
+            room_setup.update_player_attacks(self.rooms[self.current_room], self.difficulty)
             room_setup.update_fog(self.rooms[self.current_room], self.player_sprite.position, self.slayer.sight)
-            room_setup.update_enemies(self.rooms[self.current_room], self.player_sprite.position)
+            room_setup.update_enemies(self.rooms[self.current_room], self.player_sprite.position, self.difficulty)
             room_setup.update_enemy_attacks(self.rooms[self.current_room], self.player_sprite, self.slayer)
 
             position = self.music_handler.music.get_stream_position()
@@ -262,6 +290,11 @@ class NamelessDungeonCrawler(arcade.Window):
         for button in button_list:
             if button.pressed:
                 button.on_release()
+
+    def set_difficulty(self, difficulty):
+        self.difficulty = difficulty
+        for room in self.rooms:
+            room_setup.update_difficulty(room, difficulty)
 
 def main():
     game = NamelessDungeonCrawler(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
