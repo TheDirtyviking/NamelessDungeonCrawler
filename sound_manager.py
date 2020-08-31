@@ -14,6 +14,7 @@ ROOM_CLEAR = 8
 GAME_WIN = 9
 HOBGOBLIN_DEATH = 10
 HOBGOBLIN_ATTACK = 11
+CLOSE_DOOR = 12
 BACKGROUND_MUSIC = 0
 SOUND_LIBRARY = [
     ["resources/sounds/player_attack_1.mp3", "resources/sounds/player_attack_2.mp3", "resources/sounds/player_attack_3.mp3"],
@@ -27,7 +28,8 @@ SOUND_LIBRARY = [
     ["resources/sounds/room_clear.mp3"],
     ["resources/sounds/game_win.mp3"],
     ["resources/sounds/hobgoblin_death.mp3"],
-    ["resources/sounds/hobgoblin_attack_1.mp3", "resources/sounds/hobgoblin_attack_2.mp3", "resources/sounds/hobgoblin_attack_3.mp3"]
+    ["resources/sounds/hobgoblin_attack_1.mp3", "resources/sounds/hobgoblin_attack_2.mp3", "resources/sounds/hobgoblin_attack_3.mp3"],
+    ["resources/sounds/door_close.mp3"]
 ]
 MUSIC_LIBRARY = [
     ["resources/sounds/background_music.mp3"]

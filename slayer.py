@@ -6,7 +6,7 @@ class Slayer():
 
     def __init__(self):
         self.health = 10
-        self.damage = 3
+        self.damage = 2
         self.armor = 0
         self.sight = 2
         self.movespeed = 5
@@ -14,7 +14,11 @@ class Slayer():
         self.attack_range = 50
 
     def take_damage(self, damage):
-        self.health -= (damage - self.armor)
+        damage -= 1
+        dealt = damage - self.armor
+        self.health -= 1
+        if dealt > 0:
+            self.health -= dealt
 
     def heal(self, health):
         self.health += health

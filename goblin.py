@@ -4,21 +4,22 @@ import numpy as np
 from numpy import linalg as LA
 import math
 import sound_manager
+import game
 
 GOBLIN = 0
 HOBGOBLIN = 1
 
 class Goblin():
 
-    def __init__(self,  health = 4, damage = 2, armor = 0, center_x = 0, center_y = 0, attack_range = 45, gobtype=GOBLIN):
+    def __init__(self,  health = 4, damage = 2, armor = 0, center_x = 0, center_y = 0, attack_range = 45, gobtype=GOBLIN, movespeed = 3):
         self.health = health
         self.damage = damage
         self.armor = armor
         self.x = center_x
         self.y = center_y
-        self.movespeed = 3
+        self.movespeed = movespeed
         self.attack_cooldown = 0
-        self.attack_range = 45
+        self.attack_range = attack_range
         self.type = gobtype
         
 
@@ -70,10 +71,11 @@ class Goblin():
                 connect_vector = np.multiply(connect_vector, self.attack_range)
                 spawn_vector = np.add(connect_vector, [spawn_x, spawn_y])
                 room_setup.add_enemy_attack(room, spawn_vector[0], spawn_vector[1], angle, self.damage)
-                self.attack_cooldown = 20
                 if self.type == GOBLIN:
+                    self.attack_cooldown = 20
                     sound_manager.play_sound(sound_manager.GOBLIN_ATTACK, .15)
                 else:
+                    self.attack_cooldown = 45
                     sound_manager.play_sound(sound_manager.HOBGOBLIN_ATTACK, .15)
         
         

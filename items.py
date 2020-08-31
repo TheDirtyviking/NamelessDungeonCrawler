@@ -2,7 +2,7 @@ import arcade
 import sound_manager
 
 def torch_get_picked_up(slayer):
-    slayer.change_sight(1)
+    slayer.change_sight(.5)
     sound_manager.play_sound(sound_manager.TORCH_PICKUP, .15)
 
 def sword_get_picked_up(slayer):

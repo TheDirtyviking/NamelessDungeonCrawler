@@ -66,8 +66,18 @@ class NamelessDungeonCrawler(arcade.Window):
         self.slayer = slayer.Slayer()
 
         self.rooms = []
-        room = room_setup.setup_room_1()
-        self.rooms.append(room)
+        room0 = room_setup.setup_room_1()
+        self.rooms.append(room0)
+        room1 = room_setup.setup_room_2()
+        self.rooms.append(room1)
+        room2 = room_setup.setup_room_3()
+        self.rooms.append(room2)
+        room3 = room_setup.setup_room_4()
+        self.rooms.append(room3)
+        room4 = room_setup.setup_room_5()
+        self.rooms.append(room4)
+        room5 = room_setup.setup_room_6()
+        self.rooms.append(room5)
         self.current_room = 0
         self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
 
@@ -104,8 +114,9 @@ class NamelessDungeonCrawler(arcade.Window):
         else:
             self.physics_engine.update()
 
-            if self.rooms[self.current_room].next_room(self.player_sprite.center_x, self.player_sprite.center_y):
-                self.win_game()
+            new_pos = self.rooms[self.current_room].check_move_room(self.rooms[self.current_room], self.player_sprite.position, self)
+            if not new_pos == None:
+                self.player_sprite.position = new_pos
 
             item_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.rooms[self.current_room].item_list)
 
@@ -215,6 +226,10 @@ class NamelessDungeonCrawler(arcade.Window):
 
     def on_mouse_release(self, x, y, button, modifiers):
         self.check_mouse_release_for_buttons(self.handler.menu_list[self.handler.menu].buttons)
+
+    def update_room(self, room_num):
+        self.current_room = room_num
+        self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
 
     def start_game(self):
         self.in_menu = False
